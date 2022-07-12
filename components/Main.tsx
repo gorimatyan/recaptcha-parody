@@ -4,8 +4,10 @@ import { useRef, useEffect, ChangeEvent, useState } from "react";
 import ReactDOM from "react-dom";
 
 const Main: NextPage = () => {
-    // 出力する画像のURLを入れる変数
+    // 編集後の出力する画像のURLを入れる変数
     const [imageURLs, setImageURLs] = useState<string[]>([])
+    // 選択されたファイル
+    const [file, setFile] = useState("");
     // canvasの要素を所得
     const canvasRef = useRef(null);
     // canvasRefからgetContextを返す関数
@@ -22,14 +24,15 @@ const Main: NextPage = () => {
     // ↓画像ファイルのonChangeで使用
     // 選択された画像ファイルのObjectURLを突っ込んだImageオブジェクトを返す関数
     const setNewImage = (e: ChangeEvent<HTMLInputElement>): HTMLImageElement => {
+        // 画像のオブジェクトを生成
         const newImage = new Image;
-        const ctx = getCanvas();
+
+        // 画像ファイルのURLをnewImageのsrcにブチ込む処理
         if(e.target.files){
             const imageURL: string = window.URL.createObjectURL(e.target.files[0])
-            setImageURLs((prev) => {
-                return [...prev, imageURL]
-            });
             newImage.src = imageURL;
+        }else{
+            
         }
         return newImage;
     }
@@ -38,16 +41,49 @@ const Main: NextPage = () => {
         const ctx: CanvasRenderingContext2D = getContext();
         const img = setNewImage(e);
         img.onload = () => {
-            ctx.drawImage(img,0,0);
+            ctx.drawImage(img,0,0,30,30);
         }
     }
+    // const setEditedImage = (e: ChangeEvent<HTMLInputElement>,imageURL: string) => {
+    //     // 画像ファイルのURLをnewImageのsrcにブチ込む処理
+    //     if(e.target.files){
+    //         // const imageURL: string = window.URL.createObjectURL(e.target.files[0])
+    //         setImageURLs((prev) => {
+    //             return [...prev, imageURL]
+    //         });
+    //     }
+    // }
+    const setEditedImage = () => {
+            // const imageURL: string = window.URL.createObjectURL(e.target.files[0])
+            const canvas = getCanvas();
+            canvas.toBlob((blob: Blob | MediaSource)=> {
+                const imageURL = URL.createObjectURL(blob);
+                setImageURLs((prev) => {
+                    return [...prev, imageURL]
+                });
+            })
+
+    }
+    const getCanvasBlob = (): string => {
+        const canvas = getCanvas();
+        return canvas.toBlob((blob: Blob | MediaSource)=> {
+            const imageURL = URL.createObjectURL(blob);
+
+            return imageURL;
+        })
+    }
+    console.log(imageURLs);
+    
 
     return (
         <main>
             <p className="text-xl font-bold underline">タイトル</p>
             <p>の画像をすべて選択してください。</p>
 
-            <input type="file" name="files" onChange={(e) => { handleFiles(e) }} multiple />
+            <label htmlFor="fileUpload">
+                画像を選択
+            </label>
+                <input id="fileUpload" type="file" name="files" onChange={(e) => { handleFiles(e) }} value="" hidden />
 
             <div className="editArea">
                 <canvas
@@ -59,10 +95,13 @@ const Main: NextPage = () => {
                 >
                 </canvas>
             </div>
+            <button onClick={setEditedImage}>
+                確定
+            </button>
 
             <div className="outputArea">
-                {imageURLs.map((URL: string) =>
-                    <img key={URL} src={URL} alt="" />
+                {imageURLs.map((URL: string, i) =>
+                    <img key={i} src={URL} alt="" />
                 )}
 
             </div>
