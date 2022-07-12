@@ -4,53 +4,20 @@ import { useRef, useEffect, ChangeEvent, useState } from "react";
 import ReactDOM from "react-dom";
 
 const Main: NextPage = () => {
-    // const outputArea:any = useRef();
-    console.log("関数が呼ばれた");
-    
-    const canvasRef: any = useRef();
-    const [imagesURLs, setImagesURL] = useState<string[]>([]);
-    // const img: HTMLElement = new Image();
-    // ↓canvasの状態を保持
-    const [canvas, setCanvas] = useState<CanvasRenderingContext2D>();
-    let imagesAllURLs = imagesURLs;
-    useEffect(() => {
-        // output先のdivを取得
-        // console.log(outputArea.current)
-        setCanvas(canvasRef.current.getContext("2d"))
-        
-    }, [])
-    useEffect(()=> {
-        imagesAllURLs = imagesURLs;
-        console.log("useEffectが呼ばれた");
-        console.log(imagesURLs);
-        console.log(imagesAllURLs);
+    const canvasRef = useRef(null);
+    const getContext = (): CanvasRenderingContext2D => {
+       const canvas: any = canvasRef.current;
 
-    },[imagesURLs])
+       return canvas.getContext('2d');
+    }
+    const handleFiles = (e: ChangeEvent<HTMLInputElement>) => {
+        const ctx: CanvasRenderingContext2D = getContext();
+        // ctx.drawImage();
+    }
+    const getNewImage = () => {
+        const newImage = new Image;
 
-    async function handleFiles(e: ChangeEvent<HTMLInputElement>) {
-        // 選択されたファイルを取得
-        const img = new Image();
-        if (e.currentTarget.files) {
-            // 選択されたファイルのURLを取得
-            img.src = window.URL.createObjectURL(e.currentTarget.files[0]);
-
-            if (canvas) {
-                img.onload = () => {
-                    return canvas.drawImage(img, 0, 0, 30, 330);
-                }
-            }
-            let a = document.getElementById("canvas");
-            
-            let url: string = a.toDataURL();
-            // await setImagesURL((prev): string[] => {
-            //     return [...prev, url]
-            // })
-            const func =  [...imagesURLs, url];
-                
-                setImagesURL(func)
-            console.log("handleFiles")
-
-        }
+        return newImage;
     }
 
     return (
