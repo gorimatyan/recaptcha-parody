@@ -6,8 +6,6 @@ import ReactDOM from "react-dom";
 const Main: NextPage = () => {
     // 編集後の出力する画像のURLを入れる変数
     const [imageURLs, setImageURLs] = useState<string[]>([])
-    // 選択されたファイル
-    const [file, setFile] = useState("");
     // canvasの要素を所得
     const canvasRef = useRef(null);
     // canvasRefからgetContextを返す関数
@@ -26,13 +24,10 @@ const Main: NextPage = () => {
     const setNewImage = (e: ChangeEvent<HTMLInputElement>): HTMLImageElement => {
         // 画像のオブジェクトを生成
         const newImage = new Image;
-
         // 画像ファイルのURLをnewImageのsrcにブチ込む処理
         if(e.target.files){
             const imageURL: string = window.URL.createObjectURL(e.target.files[0])
             newImage.src = imageURL;
-        }else{
-            
         }
         return newImage;
     }
@@ -44,17 +39,8 @@ const Main: NextPage = () => {
             ctx.drawImage(img,0,0,30,30);
         }
     }
-    // const setEditedImage = (e: ChangeEvent<HTMLInputElement>,imageURL: string) => {
-    //     // 画像ファイルのURLをnewImageのsrcにブチ込む処理
-    //     if(e.target.files){
-    //         // const imageURL: string = window.URL.createObjectURL(e.target.files[0])
-    //         setImageURLs((prev) => {
-    //             return [...prev, imageURL]
-    //         });
-    //     }
-    // }
+
     const setEditedImage = () => {
-            // const imageURL: string = window.URL.createObjectURL(e.target.files[0])
             const canvas = getCanvas();
             canvas.toBlob((blob: Blob | MediaSource)=> {
                 const imageURL = URL.createObjectURL(blob);
@@ -101,6 +87,7 @@ const Main: NextPage = () => {
 
             <div className="outputArea">
                 {imageURLs.map((URL: string, i) =>
+                    
                     <img key={i} src={URL} alt="" />
                 )}
 
